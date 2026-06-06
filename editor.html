@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作業要領書 作成ツール</title>
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/print.css">
+</head>
+<body class="wm-editor">
+  <header class="wm-toolbar">
+    <h1>作業要領書 作成ツール</h1>
+    <div class="wm-toolbar-actions">
+      <button type="button" class="wm-btn wm-btn-light" id="btnNew">新規</button>
+      <button type="button" class="wm-btn wm-btn-light" id="btnOpen">開く</button>
+      <button type="button" class="wm-btn wm-btn-primary" id="btnSave">保存</button>
+      <button type="button" class="wm-btn wm-btn-light" id="btnPdf">PDF出力</button>
+      <button type="button" class="wm-btn wm-btn-light" id="btnPreview">印刷プレビュー</button>
+    </div>
+  </header>
+
+  <div class="wm-layout">
+    <aside class="wm-edit-column">
+      <section class="wm-panel wm-edit-panel">
+        <div class="wm-form-row wm-form-row-compact">
+          <div class="wm-field">
+            <label for="fldTitle">タイトル</label>
+            <input type="text" id="fldTitle" placeholder="例）皿 巻き方">
+          </div>
+          <div class="wm-field">
+            <label for="fldDate">日付</label>
+            <input type="date" id="fldDate">
+          </div>
+          <div class="wm-field">
+            <label for="fldAuthor">作成者</label>
+            <input type="text" id="fldAuthor" placeholder="氏名">
+          </div>
+        </div>
+
+        <p class="wm-panel-title">作業内容（上から順に追加）</p>
+        <p class="wm-stream-hint">写真とコメントを順に追加すると、右の印刷プレビューに反映されます。写真の位置・サイズはプレビュー上で調整してください。</p>
+
+        <div class="wm-edit-stream" id="editStream"></div>
+
+        <div class="wm-stream-actions">
+          <button type="button" class="wm-btn wm-btn-secondary wm-btn-sm" id="btnAddPhoto">＋ 写真を追加</button>
+          <button type="button" class="wm-btn wm-btn-secondary wm-btn-sm" id="btnAddStep">＋ コメントを追加</button>
+        </div>
+
+        <div class="wm-footer-edit">
+          <label for="fldFooter">補足説明・注意事項</label>
+          <textarea id="fldFooter" rows="3" placeholder="全体の注意点など"></textarea>
+        </div>
+
+        <p class="wm-status" id="statusText">下書きは自動保存されます</p>
+      </section>
+    </aside>
+
+    <div class="wm-preview-column">
+      <section class="wm-panel wm-preview-panel">
+        <p class="wm-panel-title">印刷プレビュー（完成イメージ・横向き A4）</p>
+        <div class="wm-preview-wrap" id="previewArea"></div>
+      </section>
+    </div>
+
+    <aside class="wm-panel wm-ref-panel">
+      <p class="wm-panel-title">参考写真
+        <button type="button" class="wm-btn-refresh" id="btnRefRefresh" title="再読み込み">↻</button>
+      </p>
+      <div class="wm-ref-drop" id="refDropZone">
+        ドロップまたはクリック<br>
+        <small>→ 画像フォルダへ保存</small>
+      </div>
+      <p class="wm-ref-path" id="refFolderPath"></p>
+      <input type="file" id="refFileInput" accept="image/*" multiple hidden>
+      <div class="wm-ref-grid" id="refGrid"></div>
+    </aside>
+  </div>
+
+  <div class="wm-modal-overlay" id="pickerModal">
+    <div class="wm-modal wm-modal-picker">
+      <h2 id="pickerTitle">写真を選択</h2>
+      <div class="wm-modal-body">
+        <div class="wm-modal-list" id="pickerList"></div>
+      </div>
+      <div class="wm-modal-footer">
+        <button type="button" class="wm-btn wm-btn-secondary" id="pickerCancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="openFileInput" accept=".html" hidden>
+
+  <div class="wm-toast" id="toast"></div>
+  <iframe id="wmPrintFrame" title="印刷用"></iframe>
+
+  <script src="js/sheet-layout.js"></script>
+  <script src="js/editor.js"></script>
+</body>
+</html>

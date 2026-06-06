@@ -1,0 +1,12 @@
+# 写真・保存データはローカルのみ（個人情報・業務データを含む可能性があるため）
+画像/
+saved/
+reference-photos/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# エディター
+.vscode/
+*.swp
