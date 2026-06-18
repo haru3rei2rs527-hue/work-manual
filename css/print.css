@@ -154,16 +154,16 @@ body.wm-print-page {
   align-content: stretch;
 }
 
-.wm-steps--n1 { grid-template-columns: 1fr; }
-.wm-steps--n2 { grid-template-columns: 1fr; }
-.wm-steps--n3 { grid-template-columns: 1fr; }
-.wm-steps--n4 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n5 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n6 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n7 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n8 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n9 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n10 { grid-template-columns: 1fr 1fr; }
+.wm-steps--n1  { grid-template-columns: 1fr; }
+.wm-steps--n2  { grid-template-columns: 1fr; }
+.wm-steps--n3  { grid-template-columns: 1fr; }
+.wm-steps--n4  { grid-template-columns: 1fr; }
+.wm-steps--n5  { grid-template-columns: 1fr; }
+.wm-steps--n6  { grid-template-columns: 1fr; }
+.wm-steps--n7  { grid-template-columns: 1fr; }
+.wm-steps--n8  { grid-template-columns: 1fr; }
+.wm-steps--n9  { grid-template-columns: 1fr; }
+.wm-steps--n10 { grid-template-columns: 1fr; }
 
 .wm-steps--dense { gap: 4px; }
 

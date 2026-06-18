@@ -112,7 +112,7 @@
     const photoCols = p <= 0 ? 0 : p === 1 ? 1 : 2;
     const photoHmm = p > 0 ? Math.max(28, Math.floor(bodyHmm / photoRows) - 3) : 0;
 
-    const stepCols = s <= 0 ? 0 : s <= 3 ? 1 : 2;
+    const stepCols = s <= 0 ? 0 : 1;
     const stepRows = s <= 0 ? 0 : Math.ceil(s / stepCols);
     const stepHmm = s > 0 ? Math.max(14, Math.floor(bodyHmm / stepRows) - 3) : 0;
 
