@@ -925,7 +925,10 @@ function exportPdf() {
     printStarted = true;
     const imgs = [...doc.images];
     let left = imgs.length;
+    let goStarted = false;
     const go = () => {
+      if (goStarted) return;
+      goStarted = true;
       setTimeout(() => {
         win.focus();
         win.print();
