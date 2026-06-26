@@ -4,6 +4,8 @@
 :root {
   --primary: #1a73e8;
   --primary-dark: #1558b0;
+  --primary-soft: #7baaf7;
+  --primary-muted: #a8c7fa;
   --gray-100: #f1f3f4;
   --gray-200: #e8eaed;
   --gray-300: #dadce0;
@@ -107,15 +109,19 @@ body.wm-editor {
 }
 
 .wm-btn-secondary {
-  background: var(--gray-200);
-  color: var(--gray-900);
+  background: var(--white);
+  color: var(--primary);
   font-weight: 600;
+  border: 1.5px solid var(--primary-muted);
 }
-.wm-btn-secondary:hover { background: var(--gray-300); }
+.wm-btn-secondary:hover {
+  background: #eef4ff;
+  border-color: var(--primary-soft);
+}
 
 .wm-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr) minmax(200px, 240px);
+  grid-template-columns: minmax(300px, 370px) minmax(0, 1fr) minmax(200px, 240px);
   gap: 12px;
   width: 100%;
   max-width: 100%;
@@ -145,21 +151,79 @@ body.wm-editor {
 
 .wm-preview-column .wm-preview-wrap {
   flex: 1;
-  min-height: 200px;
+  min-height: 120px;
   max-height: calc(100vh - 160px);
+  overflow: hidden;
 }
 
-@media (max-width: 1200px) {
+/* ── 中型：参考写真を下段へ ── */
+@media (max-width: 1280px) {
   .wm-layout {
-    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    grid-template-columns: minmax(270px, 340px) minmax(0, 1fr);
+    gap: 10px;
   }
-  .wm-ref-panel { grid-column: 1 / -1; max-height: 280px; position: static; }
+  .wm-ref-panel {
+    grid-column: 1 / -1;
+    max-height: 200px;
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .wm-ref-grid {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
-@media (max-width: 900px) {
-  .wm-layout { grid-template-columns: 1fr; }
-  .wm-edit-panel,
-  .wm-preview-column .wm-preview-panel { max-height: none; position: static; }
+/* ── 小型：縦1列レイアウト ── */
+@media (max-width: 860px) {
+  .wm-layout {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 8px 10px 24px;
+  }
+  .wm-edit-panel {
+    max-height: none;
+    position: static;
+  }
+  .wm-preview-column .wm-preview-panel {
+    position: static;
+    max-height: none;
+  }
+  .wm-preview-column .wm-preview-wrap {
+    max-height: none;
+    min-height: 0;
+  }
+  .wm-ref-panel {
+    grid-column: 1;
+    max-height: 180px;
+    position: static;
+  }
+}
+
+/* ── モバイル：コンパクト化 ── */
+@media (max-width: 600px) {
+  .wm-layout {
+    gap: 8px;
+    padding: 6px 8px 20px;
+  }
+  .wm-panel { padding: 12px; }
+  .wm-form-row-compact {
+    grid-template-columns: 1fr;
+  }
+  .wm-toolbar {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .wm-toolbar h1 { font-size: 14px; }
+  .wm-toolbar-actions { gap: 5px; }
+  .wm-btn {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+  .wm-stream-hint { font-size: 11px; }
+  .wm-ref-panel { max-height: 160px; }
 }
 
 .wm-panel {
@@ -173,8 +237,10 @@ body.wm-editor {
 .wm-panel-title {
   font-size: 13px;
   font-weight: 700;
-  color: var(--gray-700);
+  color: var(--gray-900);
   margin-bottom: 12px;
+  padding-left: 9px;
+  border-left: 3px solid var(--primary-muted);
   text-transform: none;
 }
 
@@ -201,6 +267,14 @@ body.wm-editor {
   padding: 8px 10px;
   font-family: inherit;
   font-size: 13px;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.wm-field input:focus,
+.wm-field textarea:focus {
+  outline: none;
+  border-color: var(--primary-soft);
+  box-shadow: 0 0 0 2px rgba(123,170,247,.25);
 }
 
 .wm-field textarea { resize: vertical; min-height: 60px; }
@@ -212,8 +286,12 @@ body.wm-editor {
 .wm-stream-hint {
   font-size: 11px;
   color: var(--gray-700);
-  margin: -4px 0 10px;
-  line-height: 1.45;
+  margin: -4px 0 12px;
+  line-height: 1.5;
+  background: var(--gray-100);
+  border-radius: 6px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--gray-300);
 }
 
 .wm-edit-stream {
@@ -227,14 +305,18 @@ body.wm-editor {
   border-radius: var(--radius);
   background: var(--white);
   overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07);
 }
 
 .wm-stream-block-photo .wm-stream-block-head {
-  background: #e8f0fe;
+  background: #eaf1fd;
+  border-left: 3px solid var(--primary-soft);
+  color: #3c72c4;
 }
 
 .wm-stream-block-step .wm-stream-block-head {
-  background: var(--gray-100);
+  background: #f1f3f4;
+  border-left: 3px solid var(--gray-500);
 }
 
 .wm-stream-block-head {
@@ -260,21 +342,24 @@ body.wm-editor {
   justify-content: center;
   flex-shrink: 0;
   margin-left: auto;
-  background: rgba(0,0,0,.55);
-  color: #fff;
-  border: none;
+  background: transparent;
+  color: var(--gray-500);
+  border: 1px solid var(--gray-300);
   border-radius: 4px;
   width: 24px;
   height: 24px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1;
   z-index: 2;
+  transition: background .15s, color .15s, border-color .15s;
 }
 
 .wm-stream-block-head .wm-clear-photo:hover,
 .wm-stream-block-head .wm-clear-step:hover {
   background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
 }
 
 .wm-stream-actions .wm-btn:disabled {
@@ -326,6 +411,15 @@ body.wm-editor {
   resize: vertical;
   font-family: inherit;
   line-height: 1.4;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.wm-stream-block-step .step-title:focus,
+.wm-stream-block-step .step-body:focus,
+.wm-stream-block-step .step-ref:focus {
+  outline: none;
+  border-color: var(--primary-soft);
+  box-shadow: 0 0 0 2px rgba(123,170,247,.22);
 }
 
 .wm-stream-actions {
@@ -354,10 +448,10 @@ body.wm-editor {
   height: 190mm;
   max-height: 190mm;
   max-width: none;
-  margin: 0 auto;
+  margin: 0;
   transform: scale(var(--preview-scale, 1));
-  transform-origin: top center;
-  box-shadow: none;
+  transform-origin: top left;
+  box-shadow: 0 2px 12px rgba(0,0,0,.12);
   background: #fff;
   overflow: hidden;
 }
@@ -479,7 +573,7 @@ body.wm-editor {
 }
 
 .wm-num-input.photo-num {
-  background: var(--primary);
+  background: var(--primary-soft);
   color: var(--white);
 }
 
@@ -599,13 +693,15 @@ body.wm-editor {
 .wm-ref-drop {
   border: 2px dashed var(--primary);
   border-radius: var(--radius);
-  padding: 12px;
+  padding: 14px 12px;
   text-align: center;
   font-size: 12px;
-  color: var(--gray-700);
+  font-weight: 600;
+  color: var(--primary);
   margin-bottom: 10px;
-  background: #e8f0fe;
-  transition: background .15s;
+  background: #eef4ff;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
 }
 
 .wm-ref-drop.wm-drag-over {

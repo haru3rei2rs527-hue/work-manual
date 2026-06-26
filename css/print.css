@@ -32,7 +32,7 @@ body.wm-print-page {
 .wm-sheet--dense .wm-footer-body { font-size: 8pt; line-height: 1.35; }
 
 .wm-header {
-  border-bottom: 2px solid #202124;
+  border-bottom: 3px solid #1a73e8;
   padding-bottom: 5px;
   margin-bottom: 6px;
   flex-shrink: 0;
@@ -82,7 +82,8 @@ body.wm-print-page {
 
 .wm-photo-cell {
   position: relative;
-  border: 1px solid #333;
+  border: 1px solid #c8cdd2;
+  border-top: 3px solid #1a73e8;
   min-height: 0;
   height: 100%;
   overflow: hidden;
@@ -137,11 +138,13 @@ body.wm-print-page {
 .wm-badge-step {
   position: static;
   display: inline-block;
-  background: #202124;
+  background: #1a73e8;
   color: #fff;
   font-size: 9.5pt;
-  margin-bottom: 3px;
-  padding: 2px 7px;
+  margin-bottom: 4px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25);
 }
 
 /* コメントグリッド（件数別） */
@@ -154,33 +157,36 @@ body.wm-print-page {
   align-content: stretch;
 }
 
-.wm-steps--n1 { grid-template-columns: 1fr; }
-.wm-steps--n2 { grid-template-columns: 1fr; }
-.wm-steps--n3 { grid-template-columns: 1fr; }
-.wm-steps--n4 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n5 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n6 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n7 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n8 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n9 { grid-template-columns: 1fr 1fr; }
-.wm-steps--n10 { grid-template-columns: 1fr 1fr; }
+.wm-steps--n1  { grid-template-columns: 1fr; }
+.wm-steps--n2  { grid-template-columns: 1fr; }
+.wm-steps--n3  { grid-template-columns: 1fr; }
+.wm-steps--n4  { grid-template-columns: 1fr; }
+.wm-steps--n5  { grid-template-columns: 1fr; }
+.wm-steps--n6  { grid-template-columns: 1fr; }
+.wm-steps--n7  { grid-template-columns: 1fr; }
+.wm-steps--n8  { grid-template-columns: 1fr; }
+.wm-steps--n9  { grid-template-columns: 1fr; }
+.wm-steps--n10 { grid-template-columns: 1fr; }
 
 .wm-steps--dense { gap: 4px; }
 
 .wm-step-cell {
-  border: 1px solid #333;
-  padding: 5px 7px;
+  border: 1px solid #c8cdd2;
+  border-left: 3px solid #1a73e8;
+  padding: 5px 8px;
   min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  background: #fff;
 }
 
 .wm-step-title {
   font-weight: 700;
-  font-size: 9.5pt;
-  margin-bottom: 2px;
+  font-size: 10pt;
+  margin-bottom: 3px;
   flex-shrink: 0;
+  color: #202124;
 }
 
 .wm-step-body {
@@ -195,11 +201,13 @@ body.wm-print-page {
 
 .wm-footer {
   margin-top: 6px;
-  border: 1px solid #333;
+  border: 1px solid #c8cdd2;
+  border-top: 2px solid #202124;
   padding: 5px 8px;
   flex-shrink: 0;
   max-height: 22mm;
   overflow: hidden;
+  background: #fafafa;
 }
 
 .wm-footer-label {

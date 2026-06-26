@@ -658,11 +658,17 @@ function fitPreviewScale() {
   const sheet = document.querySelector('#previewArea .wm-sheet');
   if (!wrap || !sheet) return;
   sheet.style.setProperty('--preview-scale', '1');
+  wrap.style.height = '';
   const naturalW = sheet.offsetWidth;
-  const avail = wrap.clientWidth - 20;
+  const naturalH = sheet.offsetHeight;
+  const avail = wrap.clientWidth - 8;
   if (naturalW > 0 && avail > 0) {
     const scale = Math.min(1, avail / naturalW);
-    sheet.style.setProperty('--preview-scale', String(Math.round(scale * 1000) / 1000));
+    const rounded = Math.round(scale * 1000) / 1000;
+    sheet.style.setProperty('--preview-scale', String(rounded));
+    if (rounded < 1) {
+      wrap.style.height = `${Math.ceil(naturalH * rounded) + 12}px`;
+    }
   }
 }
 
@@ -925,7 +931,10 @@ function exportPdf() {
     printStarted = true;
     const imgs = [...doc.images];
     let left = imgs.length;
+    let goStarted = false;
     const go = () => {
+      if (goStarted) return;
+      goStarted = true;
       setTimeout(() => {
         win.focus();
         win.print();
