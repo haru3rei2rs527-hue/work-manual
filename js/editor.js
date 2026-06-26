@@ -436,6 +436,28 @@ function bindToolbar() {
   document.getElementById('pickerModal').addEventListener('click', e => {
     if (e.target.id === 'pickerModal') closePicker();
   });
+
+  /* クラウド保存 */
+  document.getElementById('btnCloudSave').addEventListener('click', cloudSave);
+  document.getElementById('cloudModalClose').addEventListener('click', closeCloudModal);
+  document.getElementById('cloudModal').addEventListener('click', e => {
+    if (e.target.id === 'cloudModal') closeCloudModal();
+  });
+
+  /* URLを開く */
+  document.getElementById('btnCloudOpen').addEventListener('click', () => {
+    document.getElementById('cloudUrlInput').value = '';
+    document.getElementById('cloudOpenError').textContent = '';
+    document.getElementById('cloudOpenModal').classList.add('open');
+  });
+  document.getElementById('cloudOpenCancel').addEventListener('click', () => {
+    document.getElementById('cloudOpenModal').classList.remove('open');
+  });
+  document.getElementById('cloudOpenModal').addEventListener('click', e => {
+    if (e.target.id === 'cloudOpenModal')
+      document.getElementById('cloudOpenModal').classList.remove('open');
+  });
+  document.getElementById('cloudOpenConfirm').addEventListener('click', cloudOpenFromUrl);
 }
 
 function bindRefPanel() {
@@ -1007,4 +1029,131 @@ function toast(msg) {
 function fmtDate(iso) {
   const d = new Date(iso);
   return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+/* ─────────────────────────────────────
+   クラウド保存（Vercel Blob）
+───────────────────────────────────── */
+
+function openCloudModal(title, bodyHtml) {
+  document.getElementById('cloudModalTitle').textContent = title;
+  document.getElementById('cloudModalBody').innerHTML = bodyHtml;
+  document.getElementById('cloudModal').classList.add('open');
+}
+
+function closeCloudModal() {
+  document.getElementById('cloudModal').classList.remove('open');
+}
+
+async function cloudSave() {
+  if (!state.header.title) {
+    toast('タイトルを入力してから保存してください');
+    return;
+  }
+
+  openCloudModal('☁ クラウド保存', '<p class="wm-cloud-desc">アップロード中… しばらくお待ちください</p>');
+
+  try {
+    const data = collectData();
+    const sheetHtml = buildSheetHtml(false);
+
+    const res = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: data.baseName || undefined, data }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+
+    const { id, url: blobUrl } = await res.json();
+
+    /* 閲覧用の共有URL */
+    const viewUrl = `${location.origin}/viewer?url=${encodeURIComponent(blobUrl)}`;
+
+    openCloudModal('☁ クラウド保存 — 完了', `
+      <p class="wm-cloud-desc">保存が完了しました。下のURLを共有すると、誰でも閲覧できます。</p>
+      <div class="wm-cloud-url-row">
+        <input type="text" class="wm-cloud-url-input" id="cloudShareUrl" readonly value="${escapeAttr(viewUrl)}">
+        <button class="wm-btn wm-btn-primary-dark" id="btnCopyUrl">コピー</button>
+      </div>
+      <div class="wm-cloud-actions">
+        <a href="${escapeAttr(viewUrl)}" target="_blank" class="wm-btn wm-btn-secondary wm-cloud-link">
+          ↗ ビューアで開く
+        </a>
+      </div>
+      <p class="wm-cloud-note">※ このURLをメモしておくと後から再アクセスできます。</p>
+    `);
+
+    document.getElementById('btnCopyUrl')?.addEventListener('click', () => {
+      navigator.clipboard.writeText(viewUrl).then(() => toast('URLをコピーしました'));
+    });
+
+    document.getElementById('cloudShareUrl')?.addEventListener('click', function () {
+      this.select();
+    });
+
+  } catch (err) {
+    openCloudModal('☁ クラウド保存 — エラー', `
+      <p class="wm-cloud-desc" style="color:#d93025">保存に失敗しました: ${escapeHtml(err.message)}</p>
+    `);
+  }
+}
+
+async function cloudOpenFromUrl() {
+  const input = document.getElementById('cloudUrlInput');
+  const errorEl = document.getElementById('cloudOpenError');
+  const rawUrl = (input?.value || '').trim();
+
+  if (!rawUrl) {
+    errorEl.textContent = 'URLを入力してください';
+    return;
+  }
+
+  /* 閲覧URL（/viewer?url=...）と blob 直URLの両方に対応 */
+  let blobUrl = rawUrl;
+  try {
+    const u = new URL(rawUrl);
+    if (u.pathname === '/viewer' && u.searchParams.has('url')) {
+      blobUrl = u.searchParams.get('url');
+    }
+  } catch { /* URL パースに失敗した場合はそのまま使用 */ }
+
+  errorEl.textContent = '';
+  const confirmBtn = document.getElementById('cloudOpenConfirm');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = '読み込み中…';
+
+  try {
+    const res = await fetch(blobUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    state = migrateState({
+      baseName: data.baseName || '',
+      _previousBaseName: data.baseName || '',
+      header: data.header || {},
+      photoLabels: data.photoLabels,
+      stepLabels: data.stepLabels,
+      photos: data.photos || { '1': null, '2': null, '3': null, '4': null },
+      steps: data.steps || [],
+      footer: data.footer || '',
+      streamActive: data.streamActive,
+    });
+
+    applyToForm();
+    syncStreamActiveFromData();
+    buildEditStream();
+    saveDraft();
+
+    document.getElementById('cloudOpenModal').classList.remove('open');
+    toast('クラウドから読み込みました');
+  } catch (err) {
+    errorEl.textContent = `読み込み失敗: ${err.message}`;
+  } finally {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = '読み込む';
+  }
 }

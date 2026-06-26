@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作業要領書 ビューア</title>
+  <link rel="stylesheet" href="css/print.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+
+    /* ── ツールバー ── */
+    .vw-toolbar {
+      background: #1a73e8;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    .vw-toolbar h1 { font-size: 16px; font-weight: 600; }
+    .vw-toolbar-actions { display: flex; gap: 8px; }
+    .vw-btn {
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: background .15s;
+    }
+    .vw-btn-light { background: rgba(255,255,255,.2); color: #fff; }
+    .vw-btn-light:hover { background: rgba(255,255,255,.35); }
+    .vw-btn-white { background: #fff; color: #1a73e8; }
+    .vw-btn-white:hover { background: #f0f7ff; }
+
+    /* ── ステート表示 ── */
+    .vw-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 52px);
+      font-size: 15px;
+      color: #5f6368;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .vw-state.error { color: #d93025; }
+    .vw-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #dadce0;
+      border-top-color: #1a73e8;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── マニュアル表示エリア ── */
+    .vw-body {
+      padding: 24px 20px 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .vw-sheet-wrap {
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
+      border-radius: 4px;
+      overflow: hidden;
+      max-width: 100%;
+    }
+    .vw-sheet-wrap .wm-sheet {
+      transform-origin: top left;
+      transform: scale(var(--vw-scale, 1));
+    }
+
+    /* ── 印刷時 ── */
+    @media print {
+      .vw-toolbar { display: none; }
+      .vw-body { padding: 0; }
+      body { background: #fff; }
+      .vw-sheet-wrap {
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+
+    /* ── モバイル ── */
+    @media (max-width: 600px) {
+      .vw-toolbar { padding: 8px 12px; }
+      .vw-toolbar h1 { font-size: 14px; }
+      .vw-btn { padding: 7px 10px; font-size: 12px; }
+      .vw-body { padding: 12px 8px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="vw-toolbar">
+    <h1>作業要領書 ビューア</h1>
+    <div class="vw-toolbar-actions">
+      <button class="vw-btn vw-btn-light" id="btnEdit">✏ 編集画面へ</button>
+      <button class="vw-btn vw-btn-white" onclick="window.print()">🖨 印刷</button>
+    </div>
+  </header>
+
+  <main class="vw-body" id="viewerBody">
+    <div class="vw-state" id="viewerState">
+      <div class="vw-spinner"></div>
+      <span>読み込み中…</span>
+    </div>
+  </main>
+
+  <script src="js/sheet-layout.js"></script>
+  <script src="js/viewer.js"></script>
+</body>
+</html>

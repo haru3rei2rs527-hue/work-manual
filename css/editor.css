@@ -849,3 +849,108 @@ body.wm-editor {
 
 /* 印刷プレビュー用 iframe 非表示 */
 #wmPrintFrame { display: none; }
+
+/* ─────────────────────────────────────
+   クラウド保存ボタン
+───────────────────────────────────── */
+.wm-btn-cloud {
+  background: rgba(255,255,255,.15);
+  color: var(--white);
+  border: 1.5px solid rgba(255,255,255,.5);
+}
+.wm-btn-cloud:hover { background: rgba(255,255,255,.28); }
+
+.wm-btn-cloud-outline {
+  background: transparent;
+  color: var(--white);
+  border: 1.5px solid rgba(255,255,255,.4);
+}
+.wm-btn-cloud-outline:hover { background: rgba(255,255,255,.15); }
+
+.wm-btn-primary-dark {
+  background: var(--primary);
+  color: var(--white);
+  font-weight: 600;
+}
+.wm-btn-primary-dark:hover { background: var(--primary-dark); }
+
+/* ─────────────────────────────────────
+   クラウドモーダル
+───────────────────────────────────── */
+.wm-modal-cloud {
+  max-width: 520px;
+}
+
+.wm-modal-cloud h2 {
+  font-size: 16px;
+  padding: 18px 20px 0;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--gray-200);
+  padding-bottom: 14px;
+}
+
+.wm-cloud-desc {
+  font-size: 13px;
+  color: var(--gray-700);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.wm-cloud-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.wm-cloud-url-input {
+  flex: 1;
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  padding: 9px 11px;
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--gray-900);
+  background: var(--gray-100);
+  min-width: 0;
+  transition: border-color .15s, box-shadow .15s;
+}
+.wm-cloud-url-input:focus {
+  outline: none;
+  border-color: var(--primary-soft);
+  box-shadow: 0 0 0 2px rgba(123,170,247,.22);
+  background: var(--white);
+}
+
+.wm-cloud-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.wm-cloud-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.wm-cloud-note {
+  font-size: 11px;
+  color: var(--gray-500);
+  line-height: 1.5;
+}
+
+.wm-cloud-error {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 6px;
+  min-height: 18px;
+}
+
+.wm-modal-footer-row {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.wm-modal-footer-row .wm-btn { width: auto; }
