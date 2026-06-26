@@ -14,6 +14,9 @@
       <button type="button" class="wm-btn wm-btn-light" id="btnNew">新規</button>
       <button type="button" class="wm-btn wm-btn-light" id="btnOpen">開く</button>
       <button type="button" class="wm-btn wm-btn-primary" id="btnSave">保存</button>
+      <button type="button" class="wm-btn wm-btn-cloud" id="btnCloudSave">☁ クラウド保存</button>
+      <button type="button" class="wm-btn wm-btn-cloud-outline" id="btnCloudList">☁ 一覧</button>
+      <button type="button" class="wm-btn wm-btn-cloud-outline" id="btnCloudOpen">☁ URLを開く</button>
       <button type="button" class="wm-btn wm-btn-light" id="btnPdf">PDF出力</button>
       <button type="button" class="wm-btn wm-btn-light" id="btnPreview">印刷プレビュー</button>
     </div>
@@ -85,6 +88,36 @@
       </div>
       <div class="wm-modal-footer">
         <button type="button" class="wm-btn wm-btn-secondary" id="pickerCancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- クラウド保存モーダル -->
+  <div class="wm-modal-overlay" id="cloudModal">
+    <div class="wm-modal wm-modal-cloud">
+      <h2 id="cloudModalTitle">☁ クラウド保存</h2>
+      <div class="wm-modal-body" id="cloudModalBody">
+        <p class="wm-cloud-desc">保存中…</p>
+      </div>
+      <div class="wm-modal-footer">
+        <button type="button" class="wm-btn wm-btn-secondary" id="cloudModalClose">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- URLを開くモーダル -->
+  <div class="wm-modal-overlay" id="cloudOpenModal">
+    <div class="wm-modal wm-modal-cloud">
+      <h2>☁ URLを開く</h2>
+      <div class="wm-modal-body">
+        <p class="wm-cloud-desc">クラウド保存時に発行された共有URLを入力してください。</p>
+        <input type="url" id="cloudUrlInput" class="wm-cloud-url-input"
+               placeholder="https://… (共有URL または Blob URL)">
+        <p class="wm-cloud-error" id="cloudOpenError"></p>
+      </div>
+      <div class="wm-modal-footer wm-modal-footer-row">
+        <button type="button" class="wm-btn wm-btn-secondary" id="cloudOpenCancel">キャンセル</button>
+        <button type="button" class="wm-btn wm-btn-primary-dark" id="cloudOpenConfirm">読み込む</button>
       </div>
     </div>
   </div>

@@ -1,5 +1,7 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/editor.html" }
+    { "source": "/viewer", "destination": "/viewer.html" },
+    { "source": "/",       "destination": "/editor.html" }
   ]
 }
+
