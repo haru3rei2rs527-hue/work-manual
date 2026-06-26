@@ -1,8 +1,8 @@
-const { list } = require('@vercel/blob');
+const { neon } = require('@neondatabase/serverless');
 
 /**
  * GET /api/list
- * → { manuals: [{ id, url, uploadedAt, size }] }
+ * → { manuals: [{ id, title, author, date_label, updated_at }] }
  */
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -10,18 +10,16 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { blobs } = await list({ prefix: 'manuals/' });
+    const sql = neon(process.env.DATABASE_URL);
 
-    const manuals = blobs
-      .map(b => ({
-        id: b.pathname.replace('manuals/', '').replace('.json', ''),
-        url: b.url,
-        uploadedAt: b.uploadedAt,
-        size: b.size,
-      }))
-      .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+    const rows = await sql`
+      SELECT id, title, author, date_label, created_at, updated_at
+      FROM manuals
+      ORDER BY updated_at DESC
+      LIMIT 100
+    `;
 
-    return res.status(200).json({ manuals });
+    return res.status(200).json({ manuals: rows });
   } catch (err) {
     console.error('[api/list]', err);
     return res.status(500).json({ error: err.message });

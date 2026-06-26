@@ -954,3 +954,59 @@ body.wm-editor {
 }
 
 .wm-modal-footer-row .wm-btn { width: auto; }
+
+/* ── 保存済み一覧 ── */
+.wm-cloud-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.wm-cloud-list-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  background: var(--gray-100);
+}
+
+.wm-cloud-list-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.wm-cloud-list-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--gray-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wm-cloud-list-meta {
+  font-size: 11px;
+  color: var(--gray-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wm-cloud-list-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.wm-btn-danger {
+  background: var(--danger);
+  color: var(--white);
+}
+.wm-btn-danger:hover { background: #b5211a; }

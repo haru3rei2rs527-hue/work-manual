@@ -439,6 +439,7 @@ function bindToolbar() {
 
   /* クラウド保存 */
   document.getElementById('btnCloudSave').addEventListener('click', cloudSave);
+  document.getElementById('btnCloudList').addEventListener('click', openCloudList);
   document.getElementById('cloudModalClose').addEventListener('click', closeCloudModal);
   document.getElementById('cloudModal').addEventListener('click', e => {
     if (e.target.id === 'cloudModal') closeCloudModal();
@@ -1032,7 +1033,7 @@ function fmtDate(iso) {
 }
 
 /* ─────────────────────────────────────
-   クラウド保存（Vercel Blob）
+   クラウド保存（Neon Postgres）
 ───────────────────────────────────── */
 
 function openCloudModal(title, bodyHtml) {
@@ -1055,12 +1056,11 @@ async function cloudSave() {
 
   try {
     const data = collectData();
-    const sheetHtml = buildSheetHtml(false);
 
     const res = await fetch('/api/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: data.baseName || undefined, data }),
+      body: JSON.stringify({ data }),
     });
 
     if (!res.ok) {
@@ -1068,10 +1068,8 @@ async function cloudSave() {
       throw new Error(err.error || `HTTP ${res.status}`);
     }
 
-    const { id, url: blobUrl } = await res.json();
-
-    /* 閲覧用の共有URL */
-    const viewUrl = `${location.origin}/viewer?url=${encodeURIComponent(blobUrl)}`;
+    const { id } = await res.json();
+    const viewUrl = `${location.origin}/viewer?id=${encodeURIComponent(id)}`;
 
     openCloudModal('☁ クラウド保存 — 完了', `
       <p class="wm-cloud-desc">保存が完了しました。下のURLを共有すると、誰でも閲覧できます。</p>
@@ -1080,9 +1078,7 @@ async function cloudSave() {
         <button class="wm-btn wm-btn-primary-dark" id="btnCopyUrl">コピー</button>
       </div>
       <div class="wm-cloud-actions">
-        <a href="${escapeAttr(viewUrl)}" target="_blank" class="wm-btn wm-btn-secondary wm-cloud-link">
-          ↗ ビューアで開く
-        </a>
+        <a href="${escapeAttr(viewUrl)}" target="_blank" class="wm-btn wm-btn-secondary wm-cloud-link">↗ ビューアで開く</a>
       </div>
       <p class="wm-cloud-note">※ このURLをメモしておくと後から再アクセスできます。</p>
     `);
@@ -1090,10 +1086,7 @@ async function cloudSave() {
     document.getElementById('btnCopyUrl')?.addEventListener('click', () => {
       navigator.clipboard.writeText(viewUrl).then(() => toast('URLをコピーしました'));
     });
-
-    document.getElementById('cloudShareUrl')?.addEventListener('click', function () {
-      this.select();
-    });
+    document.getElementById('cloudShareUrl')?.addEventListener('click', function () { this.select(); });
 
   } catch (err) {
     openCloudModal('☁ クラウド保存 — エラー', `
@@ -1103,23 +1096,18 @@ async function cloudSave() {
 }
 
 async function cloudOpenFromUrl() {
-  const input = document.getElementById('cloudUrlInput');
+  const input   = document.getElementById('cloudUrlInput');
   const errorEl = document.getElementById('cloudOpenError');
-  const rawUrl = (input?.value || '').trim();
+  const raw     = (input?.value || '').trim();
 
-  if (!rawUrl) {
-    errorEl.textContent = 'URLを入力してください';
-    return;
-  }
+  if (!raw) { errorEl.textContent = 'URLまたはIDを入力してください'; return; }
 
-  /* 閲覧URL（/viewer?url=...）と blob 直URLの両方に対応 */
-  let blobUrl = rawUrl;
+  /* /viewer?id=xxx 形式と UUID 直接入力の両方に対応 */
+  let manualId = raw;
   try {
-    const u = new URL(rawUrl);
-    if (u.pathname === '/viewer' && u.searchParams.has('url')) {
-      blobUrl = u.searchParams.get('url');
-    }
-  } catch { /* URL パースに失敗した場合はそのまま使用 */ }
+    const u = new URL(raw);
+    if (u.searchParams.has('id')) manualId = u.searchParams.get('id');
+  } catch { /* UUID のみ入力の場合はそのまま */ }
 
   errorEl.textContent = '';
   const confirmBtn = document.getElementById('cloudOpenConfirm');
@@ -1127,27 +1115,7 @@ async function cloudOpenFromUrl() {
   confirmBtn.textContent = '読み込み中…';
 
   try {
-    const res = await fetch(blobUrl);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-
-    state = migrateState({
-      baseName: data.baseName || '',
-      _previousBaseName: data.baseName || '',
-      header: data.header || {},
-      photoLabels: data.photoLabels,
-      stepLabels: data.stepLabels,
-      photos: data.photos || { '1': null, '2': null, '3': null, '4': null },
-      steps: data.steps || [],
-      footer: data.footer || '',
-      streamActive: data.streamActive,
-    });
-
-    applyToForm();
-    syncStreamActiveFromData();
-    buildEditStream();
-    saveDraft();
-
+    await loadManualById(manualId);
     document.getElementById('cloudOpenModal').classList.remove('open');
     toast('クラウドから読み込みました');
   } catch (err) {
@@ -1155,5 +1123,102 @@ async function cloudOpenFromUrl() {
   } finally {
     confirmBtn.disabled = false;
     confirmBtn.textContent = '読み込む';
+  }
+}
+
+async function loadManualById(id) {
+  const res = await fetch(`/api/load?id=${encodeURIComponent(id)}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `HTTP ${res.status}`);
+  }
+  const { data } = await res.json();
+
+  state = migrateState({
+    baseName: data.baseName || '',
+    _previousBaseName: data.baseName || '',
+    header: data.header || {},
+    photoLabels: data.photoLabels,
+    stepLabels: data.stepLabels,
+    photos: data.photos || { '1': null, '2': null, '3': null, '4': null },
+    steps: data.steps || [],
+    footer: data.footer || '',
+    streamActive: data.streamActive,
+  });
+
+  applyToForm();
+  syncStreamActiveFromData();
+  buildEditStream();
+  saveDraft();
+}
+
+/* ── 保存済み一覧 ── */
+async function openCloudList() {
+  openCloudModal('☁ 保存済み一覧', '<p class="wm-cloud-desc">読み込み中…</p>');
+
+  try {
+    const res = await fetch('/api/list');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { manuals } = await res.json();
+
+    if (!manuals.length) {
+      openCloudModal('☁ 保存済み一覧', '<p class="wm-cloud-desc">保存済みのマニュアルはありません。</p>');
+      return;
+    }
+
+    const rows = manuals.map(m => {
+      const dt = new Date(m.updated_at);
+      const dtStr = `${dt.getFullYear()}/${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+      const viewUrl = `${location.origin}/viewer?id=${encodeURIComponent(m.id)}`;
+      return `
+        <div class="wm-cloud-list-row" data-id="${escapeAttr(m.id)}">
+          <div class="wm-cloud-list-info">
+            <span class="wm-cloud-list-title">${escapeHtml(m.title)}</span>
+            <span class="wm-cloud-list-meta">${escapeHtml(m.author || '—')} | ${escapeHtml(m.date_label || '—')} | 更新: ${dtStr}</span>
+          </div>
+          <div class="wm-cloud-list-actions">
+            <button class="wm-btn wm-btn-sm wm-btn-secondary js-cloud-load" data-id="${escapeAttr(m.id)}">読込</button>
+            <a href="${escapeAttr(viewUrl)}" target="_blank" class="wm-btn wm-btn-sm wm-btn-secondary wm-cloud-link">表示</a>
+            <button class="wm-btn wm-btn-sm wm-btn-danger js-cloud-delete" data-id="${escapeAttr(m.id)}" title="削除">✕</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    openCloudModal('☁ 保存済み一覧', `<div class="wm-cloud-list">${rows}</div>`);
+
+    document.querySelectorAll('.js-cloud-load').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          await loadManualById(btn.dataset.id);
+          closeCloudModal();
+          toast('クラウドから読み込みました');
+        } catch (err) {
+          toast('読み込み失敗: ' + err.message);
+        }
+      });
+    });
+
+    document.querySelectorAll('.js-cloud-delete').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('このマニュアルを削除しますか？')) return;
+        try {
+          const r = await fetch('/api/delete', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: btn.dataset.id }),
+          });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          btn.closest('.wm-cloud-list-row').remove();
+          toast('削除しました');
+        } catch (err) {
+          toast('削除失敗: ' + err.message);
+        }
+      });
+    });
+
+  } catch (err) {
+    openCloudModal('☁ 保存済み一覧 — エラー', `
+      <p class="wm-cloud-desc" style="color:#d93025">取得に失敗しました: ${escapeHtml(err.message)}</p>
+    `);
   }
 }

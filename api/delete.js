@@ -1,19 +1,20 @@
-const { del } = require('@vercel/blob');
+const { neon } = require('@neondatabase/serverless');
 
 /**
  * DELETE /api/delete
- * body: { url: string }  (Vercel Blob の公開URL)
+ * body: { id: string }
  */
 module.exports = async function handler(req, res) {
   if (req.method !== 'DELETE') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  try {
-    const { url } = req.body || {};
-    if (!url) return res.status(400).json({ error: 'url is required' });
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id が必要です' });
 
-    await del(url);
+  try {
+    const sql = neon(process.env.DATABASE_URL);
+    await sql`DELETE FROM manuals WHERE id = ${id}`;
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('[api/delete]', err);

@@ -1,4 +1,4 @@
-/* viewer.js — クラウド保存されたマニュアルを表示する */
+/* viewer.js — Neon DB から読み込んでマニュアルを表示する */
 (function () {
   /* ── ユーティリティ ── */
   function escapeHtml(s) {
@@ -11,16 +11,14 @@
 
   /* ── URL パラメータ解析 ── */
   const params = new URLSearchParams(location.search);
-  const blobUrl = params.get('url');
+  const manualId = params.get('id');
 
   /* ── DOM ── */
-  const body   = document.getElementById('viewerBody');
-  const state  = document.getElementById('viewerState');
+  const body    = document.getElementById('viewerBody');
+  const state   = document.getElementById('viewerState');
   const btnEdit = document.getElementById('btnEdit');
 
-  btnEdit.addEventListener('click', () => {
-    location.href = '/';
-  });
+  btnEdit.addEventListener('click', () => { location.href = '/'; });
 
   /* ── エラー表示 ── */
   function showError(msg) {
@@ -41,17 +39,20 @@
     wrap.style.height = `${Math.ceil(sheet.offsetHeight * rounded) + 4}px`;
   }
 
-  /* ── メイン：blob を取得してレンダリング ── */
+  /* ── メイン：API から取得してレンダリング ── */
   async function loadManual() {
-    if (!blobUrl) {
-      showError('URLパラメータが見つかりません（?url=… が必要です）');
+    if (!manualId) {
+      showError('URLパラメータが見つかりません（?id=… が必要です）');
       return;
     }
 
     try {
-      const res = await fetch(blobUrl);
-      if (!res.ok) throw new Error(`サーバーエラー: HTTP ${res.status}`);
-      const data = await res.json();
+      const res = await fetch(`/api/load?id=${encodeURIComponent(manualId)}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+      const { data } = await res.json();
 
       /* ページタイトル更新 */
       if (data.header?.title) {
@@ -65,7 +66,7 @@
         escapeHtml,
         textToHtml,
         escapeAttr,
-        photoSrc: (file) => file, /* data URL をそのまま使用 */
+        photoSrc: (file) => file,
       });
 
       /* 描画 */
